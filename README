@@ -1,0 +1,46 @@
+Dinu Maria Tatiana - 331CC
+
+        1) Pentru prima cerinta am folosit pseudocodul din cerinta pentru a implementa popularea
+tabelei de comutare (MAC).
+        - Am declarat global tabela MAC: Mac_Table = {}
+        - In fucntia main(), daca primesc un pachet, extrag adresa sursa si portul de pe care
+        a venit, iar daca nu exita deja in tabela, o adauag (cu portul sursa). Verific daca
+        destinatia MAC este deja in tabela. Daca da, trimit datele pe portul corespunzator, iar
+        daca nu, fac flooding, trimit pe toate porturile. Daca e destinatia broadcast, fac flooding.
+        - Prin functia is_unicast verific daca o adresa e unicast
+
+        2) Pentru a doua cerinta am implementat functia transport_vlan(), functia read_switch_config()
+si am adauagat functionalitatile necesare in main.
+        - In functia transport_vlan(), am implementat logica pentru transportul de pachete intr-o
+        retea cu mai multe vlan-uri:
+                ->daca pachetul vine de pe un port acces, adauga tag-ul din enunt pt un port trunk
+                sau trimite neschimbat daca se potriveste id-ul
+                ->daca pachetul vine de pe un port trunk, scoate tag-ul daca urmeaza sa fie trimis
+                pe unul acces sau trimite nemodificat pe un trunk
+        - In functia main, inainte sa trimit datele cu send_to_link, am apelat transport_vlan()
+        ca sa obtin datele corecte in functie de vlanuri si rutele alese
+        - In functia read_switch_config(), am citit switch-urile din fisiere intr-o structura cu
+        "prioritate", "ports". Pentru ports am facut o alta structura cu "type", "vlan" si le-am
+        adaugat in switch.
+
+        3) Pentru a treia cerinta am implementat functiile receive_bpdu(), parse_bpdu(), create_bpdu(),
+        send_bpdu_every_sec(). Am definit global variabilele root_bridge_ID, own_bridge_ID,
+        root_path_cost pentru a le pastra actualizate pentru fiecare switch.
+        - In functia send_bpdu_every_sec(), daca switch-ul curent e root, trimite constant pachete
+        bdpu catre porturile trunk.
+
+        -In functia create_bpdu(), imi formez datele trimise in bytes. Folosesc doar variabilele
+        de care am nevoie pentru protocolul meu STP.
+
+        -Cu functia parse_bpdu() returnez datele extrase din pachetele de date bdpu.
+
+        -In functia receive_bpdu() implementez logica STP din pseudocodul aflat in cerinta. Atunci
+        cand detectez o bucla, blochez portul, marcand cu BLOCKING. Initial fiecare switch e
+        root_bridge, iar daca primeste un bdpu cu id-ul mai mic decat al lui, isi actualizeaza
+        root_bridge_id-ul si costul. Porturile designeated si root_ports sunt marcate cu LISTENING.
+
+        -In functia de citire switch initializez variabilele globale, si fiecare switch ca fiind
+        considerat root la inceput.
+
+        In main am adaugat verificarea pentru pachetul bdpu, iar daca nu e am aduagat verificare
+        de port LISTENING inainte sa fac flooding.
